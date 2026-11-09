@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lotto Tracker 3D</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header class="top">
+    <h1 id="title">6/42 Lotto Tracker <span class="tag">3D</span></h1>
+    <p id="sub">PCSO results. Pick a year, then a month, then a day.</p>
+    <div class="seg games" role="group" aria-label="Game">
+      <button id="g642" type="button" aria-pressed="true">6/42</button>
+      <button id="g655" type="button" aria-pressed="false">6/55</button>
+      <button id="g658" type="button" aria-pressed="false">6/58</button>
+      <button id="g3d" type="button" aria-pressed="false">Swertres</button>
+      <button id="g4d" type="button" aria-pressed="false">4D</button>
+      <button id="g6d" type="button" aria-pressed="false">6D</button>
+      <button id="g2d" type="button" aria-pressed="false">2D</button>
+    </div>
+  </header>
+  <main id="app">
+    <section class="panel search" id="search" aria-label="Search a number">
+      <form id="sform" role="search">
+        <label for="sq" class="slabel">Search a number</label>
+        <div class="srow">
+          <input id="sq" type="text" inputmode="numeric" autocomplete="off" />
+          <select id="smode" aria-label="Match mode">
+            <option value="exact">Exact order</option>
+            <option value="any">Any order (Rambolito)</option>
+            <option value="seq" hidden disabled>In sequence (same order, gaps allowed)</option>
+            <option value="row" hidden disabled>In a row (side by side, same order)</option>
+            <option value="last" hidden disabled>Ends with (last digits)</option>
+            <option value="first" hidden disabled>Starts with (first digits)</option>
+          </select>
+          <select id="stime" aria-label="Draw time">
+            <option value="all">Any draw time</option>
+            <option value="2PM">2PM only</option>
+            <option value="5PM">5PM only</option>
+            <option value="9PM">9PM only</option>
+          </select>
+          <select id="smonth" aria-label="Month">
+            <option value="0">Any month</option>
+            <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+            <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+            <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+            <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+          </select>
+          <button type="submit">Search</button>
+          <button type="button" id="sclear" class="ghost">Clear</button>
+        </div>
+      </form>
+      <p id="shelp" class="shelp"></p>
+      <div id="sresult" aria-live="polite"></div>
+    </section>
+    <section class="panel search" id="straight" aria-label="6D straight match" hidden>
+      <form id="xform">
+        <label for="xq" class="slabel">Straight match: which draws had 2, 3, 4, 5 or 6 of your digits in the same place?</label>
+        <div class="srow">
+          <input id="xq" type="text" inputmode="numeric" autocomplete="off" maxlength="13" placeholder="your 6 digits, e.g. 626764" />
+          <select id="xmode" aria-label="Which digits count">
+            <option value="last">Last digits (ending)</option>
+            <option value="first">First digits (starting)</option>
+            <option value="run">Any straight stretch</option>
+            <option value="multi">Any order (not straight)</option>
+          </select>
+          <select id="xmonth" aria-label="Month">
+            <option value="0">Any month</option>
+            <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+            <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+            <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+            <option value="10">October</option><option value="11" selected>November</option><option value="12">December</option>
+          </select>
+          <select id="xyear" aria-label="Year"></select>
+          <button type="submit">Check</button>
+        </div>
+      </form>
+      <p class="shelp">Straight means the same digit in the same position. <strong>Last digits</strong> counts from the right (a 4 straight = your last 4 digits equal the draw's last 4), <strong>First digits</strong> from the left, and <strong>Any straight stretch</strong> takes the longest run of neighbouring positions that match.</p>
+      <div id="xresult" aria-live="polite"></div>
+    </section>
+    <section class="panel search" id="finder" aria-label="Find numbers by month">
+      <form id="fform">
+        <label for="fmonth" class="slabel">Find numbers that came out in the same month every year</label>
+        <div class="srow">
+          <select id="fmonth" aria-label="Month">
+            <option value="0">Any month</option>
+            <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+            <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+            <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+            <option value="10">October</option><option value="11" selected>November</option><option value="12">December</option>
+          </select>
+          <select id="fpart" aria-label="Which digits to compare" hidden>
+            <option value="0">Whole 6 digits</option>
+            <option value="last5">Last 5 digits</option><option value="last4">Last 4 digits</option><option value="last3">Last 3 digits</option><option value="last2">Last 2 digits</option>
+            <option value="first5">First 5 digits</option><option value="first4">First 4 digits</option><option value="first3">First 3 digits</option><option value="first2">First 2 digits</option>
+            <option value="any5">Any 5 straight (first or last 5)</option><option value="any4">Any 4 straight</option><option value="any3">Any 3 straight</option><option value="any2">Any 2 straight</option>
+          </select>
+          <select id="ffrom" aria-label="From year"></select>
+          <span class="fto">to</span>
+          <select id="fto" aria-label="To year"></select>
+          <button type="submit">Find numbers</button>
+        </div>
+      </form>
+      <div id="fresult" aria-live="polite"></div>
+    </section>
+    <section class="panel search" id="target" aria-label="Target list" hidden>
+      <form id="tform">
+        <label for="tq" class="slabel">Target list: which draws matched 1, 2, 3, 4, 5 or 6 of your numbers?</label>
+        <div class="srow">
+          <input id="tq" type="text" inputmode="numeric" autocomplete="off" placeholder="your target numbers, e.g. 19 23 28 04 08 18 21" />
+          <select id="tmonth" aria-label="Month">
+            <option value="0">Any month</option>
+            <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+            <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+            <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+            <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+          </select>
+          <select id="tyear" aria-label="Year"></select>
+          <button type="submit">Check target list</button>
+          <button type="button" id="tclear" class="ghost">Clear</button>
+        </div>
+      </form>
+      <p class="shelp">Type any amount of numbers (1 to 58, spaces or commas). Every draw is checked for how many of its 6 numbers are in your list, in any order and any place. Click a count to show only those draws. The table compares 6/42, 6/55 and 6/58 side by side for the same month and year. A number above a game's top number (like 48 on 6/42) cannot come out there.</p>
+      <div id="tresult" aria-live="polite"></div>
+    </section>
+    <section class="panel search" id="combo" aria-label="Combination generator" hidden>
+      <form id="cform">
+        <label for="cmonth" class="slabel">Make combinations from the numbers of a month and years</label>
+        <div class="srow">
+          <select id="cmonth" aria-label="Month">
+            <option value="0">Any month</option>
+            <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+            <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+            <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+            <option value="10">October</option><option value="11" selected>November</option><option value="12">December</option>
+          </select>
+          <select id="cfrom" aria-label="From year"></select>
+          <span class="fto">to</span>
+          <select id="cto" aria-label="To year"></select>
+          <select id="cmode" aria-label="Which numbers to use">
+            <option value="all">All numbers drawn (more often = more likely)</option>
+            <option value="every">Only numbers in every year</option>
+            <option value="top">Top 15 most frequent</option>
+          </select>
+          <select id="ccount" aria-label="How many combinations">
+            <option value="5">5 combos</option><option value="10" selected>10 combos</option><option value="20">20 combos</option><option value="50">50 combos</option>
+          </select>
+          <button type="submit">Generate</button>
+        </div>
+      </form>
+      <p class="shelp">Looks at every draw of the chosen month in the years you pick, then builds combinations of 6 numbers from the numbers that came out, favouring the ones that came out more often. This is a fun way to pick numbers from history, not a prediction: every draw is random and no combination is more likely to win.</p>
+      <div id="cresult" aria-live="polite"></div>
+    </section>
+    <section class="panel search" id="shared" aria-label="Draws that share numbers" hidden>
+      <form id="shform">
+        <label for="shmonth" class="slabel">Find draws of the same month that share 3, 4 or 5 numbers</label>
+        <div class="srow">
+          <select id="shmonth" aria-label="Month">
+            <option value="0">Any month</option>
+            <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+            <option value="4">April</option><option value="5">May</option><option value="6" selected>June</option>
+            <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+            <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+          </select>
+          <select id="shfrom" aria-label="From year"></select>
+          <span class="fto">to</span>
+          <select id="shto" aria-label="To year"></select>
+          <select id="shk" aria-label="How many numbers match">
+            <option value="3+">3 or more match</option>
+            <option value="3">Exactly 3 match</option>
+            <option value="4+">4 or more match</option>
+            <option value="4">Exactly 4 match</option>
+            <option value="5">Exactly 5 match</option>
+          </select>
+          <button type="submit">Find matches</button>
+        </div>
+      </form>
+      <p class="shelp">Compares the draws of that month across the years you pick. Numbers can be in any order and any place. Each group lists the draws that have the same 3, 4, 5 or more numbers in common (highlighted).</p>
+      <div id="shresult" aria-live="polite"></div>
+    </section>
+    <section class="panel search" id="pairs" aria-label="Pair predictor" hidden>
+      <form id="pform">
+        <label for="pq" class="slabel">Pair predictor: type your numbers and see which numbers pair best with them</label>
+        <div class="srow">
+          <input id="pq" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. 16 48 40" />
+          <button type="submit">Find best pair</button>
+        </div>
+      </form>
+      <p class="shelp">Looks at every saved draw of this game and ranks the numbers that came out in the same draw as yours most often. This is a history count, not a guarantee: every draw is random.</p>
+      <div id="presult" aria-live="polite"></div>
+    </section>
+    <div class="bar">
+      <nav id="crumbs" class="crumbs" aria-label="Breadcrumb"></nav>
+      <div class="seg" role="group" aria-label="View mode">
+        <button id="v3d" type="button" aria-pressed="true">3D</button>
+        <button id="vlist" type="button" aria-pressed="false">List</button>
+      </div>
+    </div>
+    <p class="count" id="count" aria-live="polite"></p>
+    <div id="stage-wrap">
+      <div id="stage" data-level="years" role="img" aria-label="Interactive 3D chart of lotto draws. Use the List view for a text version."></div>
+      <p class="stage-hint" id="hint"></p>
+    </div>
+    <div id="list"></div>
+    <div id="heat"></div>
+  </main>
+  <details class="import" id="imp">
+    <summary>Add or export results</summary>
+    <p>Paste results for the game you have open, one draw (6/42, 6/55, 6/58, 4D, 6D) or one day (Swertres, 2D) per line. You can also load a .csv, .txt or .json file.</p>
+    <textarea id="paste" rows="8" placeholder="Paste results here"></textarea>
+    <div class="row">
+      <input type="file" id="file" accept=".csv,.txt,.json" />
+      <button id="add">Add draws</button>
+      <button id="export" class="ghost">Export all as JSON</button>
+      <button id="clear" class="ghost">Remove added draws</button>
+    </div>
+    <p id="msg" role="status"></p>
+  </details>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
